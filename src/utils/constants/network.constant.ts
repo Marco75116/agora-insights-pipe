@@ -1,4 +1,7 @@
 import { ethNetworkConfig } from './networkConfigs/eth.ntworkconfig'
+import { mantleNetworkConfig } from './networkConfigs/mantle.networkconfig'
+import { monadNetworkConfig } from './networkConfigs/monad.networkconfig'
+import { polNetworkConfig } from './networkConfigs/pol.networkconfig'
 
 export type ContractConfig = {
   address: string;
@@ -14,6 +17,9 @@ export type NetworkConfig = {
 
 export const networksConfigs: Record<string, NetworkConfig> = {
   eth: ethNetworkConfig,
+  mantle: mantleNetworkConfig,
+  monad: monadNetworkConfig,
+  pol: polNetworkConfig,
 };
 
 export const tokensStartBlock = Math.min(
