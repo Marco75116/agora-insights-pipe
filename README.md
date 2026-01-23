@@ -73,6 +73,67 @@ import * as tokenAbi from './abi/token'
 - `bun down` - Stop ClickHouse
 - `bun typegen` - Generate TypeScript types from ABIs
 
+## Example Queries
+
+### Get Current Balance
+```sql
+SELECT
+    wallet_address,
+    token_address,
+    sum(amount) as balance
+FROM balances
+WHERE chain_id = 1
+  AND wallet_address = '0x3c91c82eeca58fda027c58410405fcefffa36f0c'
+  AND token_address = '0x00000000efe302beaa2b3e6e1b18d08d69a9012a'
+GROUP BY wallet_address, token_address;
+```
+
+### Get Balance History (Time Series)
+```sql
+SELECT
+    block_number,
+    sum(delta) OVER (ORDER BY block_number) as running_balance,
+    delta as change
+FROM balance_snapshots
+WHERE chain_id = 1
+  AND wallet_address = '0x3c91c82eeca58fda027c58410405fcefffa36f0c'
+  AND token_address = '0x00000000efe302beaa2b3e6e1b18d08d69a9012a'
+ORDER BY block_number;
+```
+
+### Get Balance at Specific Block
+```sql
+SELECT
+    wallet_address,
+    token_address,
+    sum(delta) as balance_at_block
+FROM balance_snapshots
+WHERE chain_id = 1
+  AND wallet_address = '0x3c91c82eeca58fda027c58410405fcefffa36f0c'
+  AND token_address = '0x00000000efe302beaa2b3e6e1b18d08d69a9012a'
+  AND block_number <= 20500000
+GROUP BY wallet_address, token_address;
+```
+
+### Get Number of Token Holders
+```sql
+SELECT
+    token_address,
+    countIf(balance > 0) as holder_count
+FROM (
+    SELECT
+        token_address,
+        wallet_address,
+        sum(amount) as balance
+    FROM balances
+    WHERE chain_id = 1
+      AND token_address = '0x00000000efe302beaa2b3e6e1b18d08d69a9012a'
+    GROUP BY token_address, wallet_address
+)
+WHERE balance > 0
+GROUP BY token_address;
+```
+
 ## Environment
 
 Copy `.env.example` to `.env` and configure:
