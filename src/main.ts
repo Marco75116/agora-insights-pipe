@@ -50,6 +50,7 @@ async function main() {
           id: getTransferId(networkConfig.chainId, t.rawEvent.transactionHash, t.rawEvent.logIndex),
           chain_id: networkConfig.chainId,
           block_number: t.block.number,
+          timestamp: Math.floor(t.timestamp.getTime() / 1000),
           token: t.contract,
           from: t.event.from,
           to: t.event.to,

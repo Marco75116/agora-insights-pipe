@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS erc20_transfers (
     id String CODEC(ZSTD(3)),
     chain_id UInt16 CODEC(DoubleDelta, ZSTD(3)),
     block_number UInt64 CODEC(DoubleDelta, ZSTD(3)),
+    timestamp DateTime CODEC(DoubleDelta, ZSTD(3)),
     token FixedString(42) CODEC(ZSTD(9)),
     from FixedString(42) CODEC(ZSTD(3)),
     to FixedString(42) CODEC(ZSTD(3)),
@@ -94,3 +95,23 @@ SELECT
     -CAST(amount AS Int256) as amount
 FROM erc20_transfers
 WHERE `to` = '0x0000000000000000000000000000000000000000';
+
+-- Daily transfer statistics
+CREATE TABLE IF NOT EXISTS transfer_stats_daily (
+    chain_id UInt16 CODEC(DoubleDelta, ZSTD(3)),
+    token_address FixedString(42) CODEC(ZSTD(9)),
+    date Date CODEC(DoubleDelta, ZSTD(3)),
+    transfer_count UInt64 CODEC(ZSTD(3)),
+    volume Int256 CODEC(ZSTD(3))
+) ENGINE = SummingMergeTree()
+ORDER BY (chain_id, token_address, date);
+
+-- Materialized view: aggregate daily transfer stats
+CREATE MATERIALIZED VIEW IF NOT EXISTS transfer_stats_daily_mv TO transfer_stats_daily AS
+SELECT
+    chain_id,
+    token as token_address,
+    toDate(timestamp) as date,
+    1 as transfer_count,
+    CAST(amount AS Int256) as volume
+FROM erc20_transfers;
