@@ -3,7 +3,7 @@ import { evmDecoder, evmPortalSource } from '@subsquid/pipes/evm'
 import { clickhouseTarget } from '@subsquid/pipes/targets/clickhouse'
 import { initSchemaStatements } from './schema'
 import { clickhouseClient } from './utils/clients/clickhouse.client'
-import { networksConfigs, tokenAddresses, tokensStartBlock } from './utils/constants/network.constant'
+import { networksConfigs } from './utils/constants/network.constant'
 import { portalSqliteCache } from '@subsquid/pipes/portal-cache/node'
 import { getLogger } from './utils/helpers/global.helper'
 import { getTransferId } from './utils/helpers/transfer.helper'
@@ -37,11 +37,11 @@ async function main() {
   })
     .pipe(
       evmDecoder({
-        range: { from: tokensStartBlock },
+        range: { from: networkConfig.tokensStartBlock },
         events: {
           transfers: ausdAbi.events.Transfer,
         },
-        contracts: tokenAddresses,
+        contracts: networkConfig.tokenAddresses,
       }),
     )
     .pipe({

@@ -13,6 +13,8 @@ export type NetworkConfig = {
   chainId: number;
   chainTag: string;
   tokens: ContractConfig[];
+  tokensStartBlock: number;
+  tokenAddresses: string[];
 };
 
 export const networksConfigs: Record<string, NetworkConfig> = {
@@ -21,11 +23,3 @@ export const networksConfigs: Record<string, NetworkConfig> = {
   monad: monadNetworkConfig,
   pol: polNetworkConfig,
 };
-
-export const tokensStartBlock = Math.min(
-  ...Object.values(networksConfigs).flatMap((n) => n.tokens.map((t) => t.range.from))
-);
-
-export const tokenAddresses = Object.values(networksConfigs).flatMap((n) =>
-  n.tokens.map((t) => t.address)
-);
