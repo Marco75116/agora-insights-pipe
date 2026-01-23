@@ -115,3 +115,41 @@ SELECT
     1 as transfer_count,
     CAST(amount AS Int256) as volume
 FROM erc20_transfers;
+
+-- Daily mint/burn statistics for charts
+CREATE TABLE IF NOT EXISTS mint_burn_daily (
+    chain_id UInt16 CODEC(DoubleDelta, ZSTD(3)),
+    token_address FixedString(42) CODEC(ZSTD(9)),
+    date Date CODEC(DoubleDelta, ZSTD(3)),
+    mint_count UInt64 CODEC(ZSTD(3)),
+    mint_volume Int256 CODEC(ZSTD(3)),
+    burn_count UInt64 CODEC(ZSTD(3)),
+    burn_volume Int256 CODEC(ZSTD(3))
+) ENGINE = SummingMergeTree()
+ORDER BY (chain_id, token_address, date);
+
+-- Materialized view: daily mints (from zero address)
+CREATE MATERIALIZED VIEW IF NOT EXISTS mint_daily_mv TO mint_burn_daily AS
+SELECT
+    chain_id,
+    token as token_address,
+    toDate(timestamp) as date,
+    1 as mint_count,
+    CAST(amount AS Int256) as mint_volume,
+    0 as burn_count,
+    0 as burn_volume
+FROM erc20_transfers
+WHERE `from` = '0x0000000000000000000000000000000000000000';
+
+-- Materialized view: daily burns (to zero address)
+CREATE MATERIALIZED VIEW IF NOT EXISTS burn_daily_mv TO mint_burn_daily AS
+SELECT
+    chain_id,
+    token as token_address,
+    toDate(timestamp) as date,
+    0 as mint_count,
+    0 as mint_volume,
+    1 as burn_count,
+    CAST(amount AS Int256) as burn_volume
+FROM erc20_transfers
+WHERE `to` = '0x0000000000000000000000000000000000000000';
