@@ -35,3 +35,36 @@ SELECT
     token as token_address,
     -CAST(amount AS Int256) as amount
 FROM erc20_transfers;
+
+-- Balance snapshots: track balance changes at each block
+CREATE TABLE IF NOT EXISTS balance_snapshots (
+    chain_id UInt16,
+    block_number UInt64,
+    wallet_address FixedString(42),
+    token_address FixedString(42),
+    delta Int256,
+    sign Int8
+) ENGINE = SummingMergeTree()
+ORDER BY (chain_id, wallet_address, token_address, block_number);
+
+-- Snapshot incoming transfers
+CREATE MATERIALIZED VIEW IF NOT EXISTS snapshots_incoming TO balance_snapshots AS
+SELECT
+    chain_id,
+    block_number,
+    to as wallet_address,
+    token as token_address,
+    CAST(amount AS Int256) as delta,
+    1 as sign
+FROM erc20_transfers;
+
+-- Snapshot outgoing transfers
+CREATE MATERIALIZED VIEW IF NOT EXISTS snapshots_outgoing TO balance_snapshots AS
+SELECT
+    chain_id,
+    block_number,
+    `from` as wallet_address,
+    token as token_address,
+    -CAST(amount AS Int256) as delta,
+    1 as sign
+FROM erc20_transfers;
