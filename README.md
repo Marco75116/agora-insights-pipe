@@ -17,13 +17,20 @@ bun eth
 
 ## What It Indexes
 
-Tracks ERC20 Transfer events and stores:
+### Tables
+
+**`erc20_transfers`** - All ERC20 transfer events:
 - Transfer ID (unique across chains)
 - Chain ID and block number
 - Token contract address
 - From/to addresses and amount
 
-Data is stored in ClickHouse optimized for multi-chain queries.
+**`balances`** - Automatically calculated token balances:
+- Wallet address and token address per chain
+- Current balance (auto-aggregated from transfers)
+- Updated automatically via ClickHouse materialized views
+
+Data is stored in ClickHouse optimized for multi-chain queries. See `queries.sql` for example queries.
 
 ## Configuration
 
