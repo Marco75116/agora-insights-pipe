@@ -11,8 +11,7 @@
     "all": "bun src/main.ts eth & bun src/main.ts mantle & bun src/main.ts monad & bun src/main.ts pol & wait",
     "typegen": "squid-evm-typegen --clean src/abi ./abi/*.json",
     "up": "docker compose up -d",
-    "down": "docker compose down",
-    "dashboard": "bun src/server.ts"
+    "down": "docker compose down"
   },
   "devDependencies": {
     "@types/bun": "latest"
