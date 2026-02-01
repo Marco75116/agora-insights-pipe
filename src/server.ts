@@ -27,7 +27,7 @@ async function getWalletBalance(address: string): Promise<Record<string, unknown
 
 function renderDashboard(address: string, isValidFormat: boolean, data: Record<string, unknown>): string {
   const errorBadge = !isValidFormat
-    ? `<span style="background-color: #dc3545; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px;">Wrong format address</span>`
+    ? `<span style="background-color: #dc3545; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px;">Invalid format address</span>`
     : ''
 
   return `<!DOCTYPE html>
