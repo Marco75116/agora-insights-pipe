@@ -62,6 +62,9 @@ async function main() {
     .pipeTo(
       clickhouseTarget({
         client: clickhouseClient,
+        settings: {
+          id: networkConfig.chainTag,
+        },
         onStart: async ({ store }) => {
           for (const stmt of initSchemaStatements) {
             await store.command({ query: stmt })
