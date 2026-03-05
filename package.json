@@ -19,11 +19,11 @@
     "@types/bun": "latest"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@clickhouse/client": "^1.16.0",
-    "@subsquid/evm-typegen": "^4.5.1",
-    "@subsquid/pipes": "^0.1.0-beta.15"
+    "@clickhouse/client": "^1.18.1",
+    "@subsquid/evm-typegen": "^4.6.0",
+    "@subsquid/pipes": "^0.1.0-beta.16"
   }
 }
