@@ -41,18 +41,20 @@ FROM erc20_transfers;
 CREATE TABLE IF NOT EXISTS balance_snapshots (
     chain_id UInt16 CODEC(DoubleDelta, ZSTD(3)),
     block_number UInt64 CODEC(DoubleDelta, ZSTD(3)),
+    date Date CODEC(DoubleDelta, ZSTD(3)),
     wallet_address FixedString(42) CODEC(ZSTD(3)),
     token_address FixedString(42) CODEC(ZSTD(9)),
     delta Int256 CODEC(ZSTD(3)),
     sign Int8 CODEC(ZSTD(1))
 ) ENGINE = SummingMergeTree()
-ORDER BY (chain_id, wallet_address, token_address, block_number);
+ORDER BY (chain_id, wallet_address, token_address, date, block_number);
 
 -- Snapshot incoming transfers
 CREATE MATERIALIZED VIEW IF NOT EXISTS snapshots_incoming TO balance_snapshots AS
 SELECT
     chain_id,
     block_number,
+    toDate(timestamp) as date,
     to as wallet_address,
     token as token_address,
     CAST(amount AS Int256) as delta,
@@ -64,6 +66,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS snapshots_outgoing TO balance_snapshots A
 SELECT
     chain_id,
     block_number,
+    toDate(timestamp) as date,
     `from` as wallet_address,
     token as token_address,
     -CAST(amount AS Int256) as delta,
