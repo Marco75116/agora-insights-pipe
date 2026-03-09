@@ -153,3 +153,32 @@ SELECT
     CAST(amount AS Int256) as burn_volume
 FROM erc20_transfers
 WHERE `to` = '0x0000000000000000000000000000000000000000';
+
+-- Daily total supply changes (net mints - burns per day)
+CREATE TABLE IF NOT EXISTS total_supply_daily (
+    chain_id UInt16 CODEC(DoubleDelta, ZSTD(3)),
+    token_address FixedString(42) CODEC(ZSTD(9)),
+    date Date CODEC(DoubleDelta, ZSTD(3)),
+    amount Int256 CODEC(ZSTD(3))
+) ENGINE = SummingMergeTree()
+ORDER BY (chain_id, token_address, date);
+
+-- Materialized view: daily mints (from zero address)
+CREATE MATERIALIZED VIEW IF NOT EXISTS total_supply_daily_mints TO total_supply_daily AS
+SELECT
+    chain_id,
+    token as token_address,
+    toDate(timestamp) as date,
+    CAST(amount AS Int256) as amount
+FROM erc20_transfers
+WHERE `from` = '0x0000000000000000000000000000000000000000';
+
+-- Materialized view: daily burns (to zero address)
+CREATE MATERIALIZED VIEW IF NOT EXISTS total_supply_daily_burns TO total_supply_daily AS
+SELECT
+    chain_id,
+    token as token_address,
+    toDate(timestamp) as date,
+    -CAST(amount AS Int256) as amount
+FROM erc20_transfers
+WHERE `to` = '0x0000000000000000000000000000000000000000';
