@@ -5,7 +5,7 @@ import { initSchemaStatements } from './schema'
 import { clickhouseClient } from './utils/clients/clickhouse.client'
 import { networksConfigs } from './utils/constants/network.constant'
 import { portalSqliteCache } from '@subsquid/pipes/portal-cache/node'
-import { getLogger } from './utils/helpers/global.helper'
+import { getLogger, getSyncCursor } from './utils/helpers/global.helper'
 import { getTransferId } from './utils/helpers/transfer.helper'
 import type { TransferRecord } from './utils/types/global.type'
 import * as ausdAbi from './abi/ausd'
@@ -24,6 +24,14 @@ const networkConfig = networksConfigs[networkTag]!
 async function main() {
   const logger = getLogger(networkConfig.chainTag);
   logger.info(`Starting indexer for chain ID ${networkConfig.chainId}`);
+
+  // Log sync cursor using the same query as SDK's getCursor
+  const cursor = await getSyncCursor(clickhouseClient, networkConfig.chainTag!)
+  if (cursor) {
+    logger.info(`Resuming from block ${cursor.number} (hash: ${cursor.hash})`)
+  } else {
+    logger.info(`No cursor found — starting fresh from block ${networkConfig.tokensStartBlock.toLocaleString()}`)
+  }
 
   await evmPortalSource({
     portal: {
@@ -64,6 +72,7 @@ async function main() {
         client: clickhouseClient,
         settings: {
           id: networkConfig.chainTag,
+          maxRows: 100,
         },
         onStart: async ({ store }) => {
           for (const stmt of initSchemaStatements) {
