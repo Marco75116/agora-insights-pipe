@@ -5,15 +5,15 @@
     "": {
       "name": "erc20-pipe",
       "dependencies": {
-        "@clickhouse/client": "latest",
-        "@subsquid/evm-typegen": "latest",
-        "@subsquid/pipes": "latest",
+        "@clickhouse/client": "^1.18.2",
+        "@subsquid/evm-typegen": "^4.6.0",
+        "@subsquid/pipes": "^0.1.0-beta.16",
       },
       "devDependencies": {
-        "@types/bun": "latest",
+        "@types/bun": "^1.3.10",
       },
       "peerDependencies": {
-        "typescript": "latest",
+        "typescript": "^5.9.3",
       },
     },
   },
