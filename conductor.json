@@ -1,0 +1,6 @@
+{
+  "scripts": {
+    "setup": "bun install && bun typegen",
+    "run": "bun all"
+  }
+}
