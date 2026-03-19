@@ -92,4 +92,4 @@ await evmPortalSource({
 
 ### ClickHouse Schema Pitfall
 
-Never use `UInt16` for `chain_id` columns. EVM chain IDs can exceed 65,535 (e.g., Katana is 747474). ClickHouse silently overflows without error, causing data to be stored under the wrong ID (`747474 % 65536 = 26578`). Always use `UInt32` or larger for chain IDs.
+When choosing ClickHouse integer types for storage optimization, ensure the type can hold the full range of expected values. ClickHouse silently overflows without error — data is stored under the wrong value with no warning. Always verify the max value of the data before picking a smaller type (e.g., UInt16 max is 65,535, UInt32 max is ~4.2B).
