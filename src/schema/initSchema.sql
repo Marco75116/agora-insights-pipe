@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS erc20_transfers (
     id String CODEC(ZSTD(3)),
-    chain_id UInt16 CODEC(DoubleDelta, ZSTD(3)),
+    chain_id UInt32 CODEC(DoubleDelta, ZSTD(3)),
     block_number UInt64 CODEC(DoubleDelta, ZSTD(3)),
     timestamp DateTime CODEC(DoubleDelta, ZSTD(3)),
     token FixedString(42) CODEC(ZSTD(9)),
@@ -12,7 +12,7 @@ ORDER BY (chain_id, id);
 
 -- Balance tracking table (automatically aggregated)
 CREATE TABLE IF NOT EXISTS balances (
-    chain_id UInt16 CODEC(DoubleDelta, ZSTD(3)),
+    chain_id UInt32 CODEC(DoubleDelta, ZSTD(3)),
     wallet_address FixedString(42) CODEC(ZSTD(3)),
     token_address FixedString(42) CODEC(ZSTD(9)),
     amount Int256 CODEC(ZSTD(3))
@@ -39,7 +39,7 @@ FROM erc20_transfers;
 
 -- Balance snapshots: track balance changes at each block
 CREATE TABLE IF NOT EXISTS balance_snapshots (
-    chain_id UInt16 CODEC(DoubleDelta, ZSTD(3)),
+    chain_id UInt32 CODEC(DoubleDelta, ZSTD(3)),
     block_number UInt64 CODEC(DoubleDelta, ZSTD(3)),
     date Date CODEC(DoubleDelta, ZSTD(3)),
     wallet_address FixedString(42) CODEC(ZSTD(3)),
@@ -75,7 +75,7 @@ FROM erc20_transfers;
 
 -- Total supply tracking (mints - burns)
 CREATE TABLE IF NOT EXISTS total_supply (
-    chain_id UInt16 CODEC(DoubleDelta, ZSTD(3)),
+    chain_id UInt32 CODEC(DoubleDelta, ZSTD(3)),
     token_address FixedString(42) CODEC(ZSTD(9)),
     amount Int256 CODEC(ZSTD(3))
 ) ENGINE = SummingMergeTree()
@@ -101,7 +101,7 @@ WHERE `to` = '0x0000000000000000000000000000000000000000';
 
 -- Daily transfer statistics
 CREATE TABLE IF NOT EXISTS transfer_stats_daily (
-    chain_id UInt16 CODEC(DoubleDelta, ZSTD(3)),
+    chain_id UInt32 CODEC(DoubleDelta, ZSTD(3)),
     token_address FixedString(42) CODEC(ZSTD(9)),
     date Date CODEC(DoubleDelta, ZSTD(3)),
     transfer_count UInt64 CODEC(ZSTD(3)),
@@ -121,7 +121,7 @@ FROM erc20_transfers;
 
 -- Daily mint/burn statistics for charts
 CREATE TABLE IF NOT EXISTS mint_burn_daily (
-    chain_id UInt16 CODEC(DoubleDelta, ZSTD(3)),
+    chain_id UInt32 CODEC(DoubleDelta, ZSTD(3)),
     token_address FixedString(42) CODEC(ZSTD(9)),
     date Date CODEC(DoubleDelta, ZSTD(3)),
     mint_count UInt64 CODEC(ZSTD(3)),
@@ -159,7 +159,7 @@ WHERE `to` = '0x0000000000000000000000000000000000000000';
 
 -- Daily total supply changes (net mints - burns per day)
 CREATE TABLE IF NOT EXISTS total_supply_daily (
-    chain_id UInt16 CODEC(DoubleDelta, ZSTD(3)),
+    chain_id UInt32 CODEC(DoubleDelta, ZSTD(3)),
     token_address FixedString(42) CODEC(ZSTD(9)),
     date Date CODEC(DoubleDelta, ZSTD(3)),
     amount Int256 CODEC(ZSTD(3))
