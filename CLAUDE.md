@@ -89,3 +89,7 @@ await evmPortalSource({
 - **Range** — Controls where indexing begins (supports `"latest"` for real-time)
 - **Events** — Specify which events to decode with their ABI definitions
 - **Rollback handling** — Implement `onRollback` for chain reorg consistency
+
+### ClickHouse Schema Pitfall
+
+Never use `UInt16` for `chain_id` columns. EVM chain IDs can exceed 65,535 (e.g., Katana is 747474). ClickHouse silently overflows without error, causing data to be stored under the wrong ID (`747474 % 65536 = 26578`). Always use `UInt32` or larger for chain IDs.
