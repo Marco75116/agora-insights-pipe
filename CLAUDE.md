@@ -89,3 +89,7 @@ await evmPortalSource({
 - **Range** — Controls where indexing begins (supports `"latest"` for real-time)
 - **Events** — Specify which events to decode with their ABI definitions
 - **Rollback handling** — Implement `onRollback` for chain reorg consistency
+
+### ClickHouse Schema Pitfall
+
+When choosing ClickHouse integer types for storage optimization, ensure the type can hold the full range of expected values. ClickHouse silently overflows without error — data is stored under the wrong value with no warning. Always verify the max value of the data before picking a smaller type (e.g., UInt16 max is 65,535, UInt32 max is ~4.2B).
